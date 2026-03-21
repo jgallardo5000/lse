@@ -1,0 +1,26 @@
+2026-03-20 23:36:01,683  INFO      Conexión Oracle (Thin mode) establecida correctamente.
+2026-03-20 23:36:01,730  INFO      Conexión PostgreSQL establecida correctamente.
+2026-03-20 23:36:01,730  INFO      PASO 1 — Consultando mensajes COPRAR en Oracle…
+2026-03-20 23:36:46,677  INFO      PASO 2 — Consultando equipamientos para ID_INTERNO=685236…
+2026-03-20 23:36:52,780  INFO        → 5 equipamientos recuperados de Oracle.
+2026-03-20 23:37:03,887  INFO        → DELETE equipamientos_escala WHERE escala=82784: 5 filas eliminadas.
+2026-03-20 23:37:19,694  INFO        → 5 equipamientos insertados en equipamientos_escala.
+2026-03-20 23:37:42,046  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-20 23:38:01,707  INFO        → 5 equipamientos insertados en equipamientos_escala.
+2026-03-20 23:38:19,391  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-20 23:38:27,112  INFO        → 5 equipamientos insertados en equipamientos_escala.
+2026-03-20 23:38:27,115  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-20 23:38:40,260  INFO        → 5 equipamientos insertados en equipamientos_escala.
+2026-03-20 23:38:41,244  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-20 23:38:43,531  INFO        → 5 equipamientos insertados en equipamientos_escala.
+2026-03-20 23:38:44,490  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-20 23:38:46,219  INFO      PASO 2 completado y cambios confirmados en PostgreSQL.
+2026-03-20 23:38:48,498  INFO      PASO 3 — Cargando partidas para escala=82784…
+2026-03-20 23:38:48,500  INFO        → 5 equipamientos a procesar.
+2026-03-20 23:38:48,535  WARNING     [AVISO] Sin registros en Oracle para equipamiento: ECMU5652565
+2026-03-20 23:38:48,628  WARNING     [AVISO] Sin registros en Oracle para equipamiento: ECMU5652708
+2026-03-20 23:38:48,724  INFO        ✓ CMAU6595343: 1 partidas/eventos insertados.
+2026-03-20 23:38:48,817  INFO        ✓ CMAU3492906: 1 partidas/eventos insertados.
+2026-03-20 23:38:48,910  INFO        ✓ SEKU5799850: 1 partidas/eventos insertados.
+2026-03-20 23:38:48,911  INFO      PASO 3 completado. Insertados: 3 | Equipamientos sin datos: 2
+2026-03-20 23:38:50,716  INFO      Conexiones cerradas.

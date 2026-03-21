@@ -1,0 +1,25 @@
+2026-03-21 18:08:20,793  INFO      Conexión Oracle (Thin mode) establecida correctamente.
+2026-03-21 18:08:20,831  INFO      Conexión PostgreSQL establecida correctamente.
+2026-03-21 18:08:20,831  INFO      PASO 1 — Consultando mensajes COPRAR en Oracle…
+2026-03-21 18:09:54,787  INFO      PASO 2 — Consultando equipamientos para ID_INTERNO=685309…
+2026-03-21 18:09:54,916  INFO        → 5 equipamientos recuperados de Oracle.
+2026-03-21 18:09:54,926  INFO        → DELETE equipamientos_escala WHERE escala=82057: 0 filas eliminadas.
+2026-03-21 18:09:54,929  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 18:09:54,933  INFO        → 2 filas actualizadas con tara desde tabla taras.
+2026-03-21 18:09:54,934  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 18:09:54,935  INFO        → 2 filas actualizadas con tara desde tabla taras.
+2026-03-21 18:09:54,935  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 18:09:54,936  INFO        → 2 filas actualizadas con tara desde tabla taras.
+2026-03-21 18:09:54,936  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 18:09:54,937  INFO        → 2 filas actualizadas con tara desde tabla taras.
+2026-03-21 18:09:54,938  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 18:09:54,939  INFO        → 2 filas actualizadas con tara desde tabla taras.
+2026-03-21 18:09:54,941  INFO      PASO 2 completado y cambios confirmados en PostgreSQL.
+2026-03-21 18:09:54,941  INFO      PASO 3 — borra partidas para escala=82057…
+2026-03-21 18:09:54,944  INFO        → DELETE partidas_equipamiento WHERE idlista=685309: 0 filas eliminadas.
+2026-03-21 18:09:54,945  INFO      PASO 3 — Cargando partidas para escala=82057…
+2026-03-21 18:09:54,946  INFO        → 5 equipamientos a procesar.
+2026-03-21 18:09:54,946  INFO        → Consultando bloque de 5 equipamientos en Oracle…
+2026-03-21 18:09:55,109  INFO        ✓ Recibidas 8 partidas de Oracle. Insertando en Postgres…
+2026-03-21 18:09:55,121  INFO      PASO 3 completado. Total partidas insertadas: 8
+2026-03-21 18:09:55,228  INFO      Conexiones cerradas.

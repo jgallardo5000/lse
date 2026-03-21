@@ -1,0 +1,23 @@
+2026-03-21 00:06:54,319  INFO      Conexión Oracle (Thin mode) establecida correctamente.
+2026-03-21 00:06:54,353  INFO      Conexión PostgreSQL establecida correctamente.
+2026-03-21 00:06:54,354  INFO      PASO 1 — Consultando mensajes COPRAR en Oracle…
+2026-03-21 00:07:13,413  INFO      PASO 2 — Consultando equipamientos para ID_INTERNO=685236…
+2026-03-21 00:07:13,547  INFO        → 5 equipamientos recuperados de Oracle.
+2026-03-21 00:07:13,557  INFO        → DELETE equipamientos_escala WHERE escala=82784: 5 filas eliminadas.
+2026-03-21 00:07:13,559  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:07:13,563  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:07:13,564  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:07:13,564  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:07:13,565  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:07:13,565  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:07:13,565  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:07:13,565  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:07:13,566  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:07:13,566  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:07:13,568  INFO      PASO 2 completado y cambios confirmados en PostgreSQL.
+2026-03-21 00:07:13,568  INFO      PASO 3 — Cargando partidas para escala=82784…
+2026-03-21 00:07:13,569  INFO        → 5 equipamientos a procesar.
+2026-03-21 00:07:13,569  INFO        → Consultando bloque de 5 equipamientos en Oracle…
+2026-03-21 00:07:13,688  INFO        ✓ Recibidas 3 partidas de Oracle. Insertando en Postgres…
+2026-03-21 00:07:13,698  INFO      PASO 3 completado. Total partidas insertadas: 3
+2026-03-21 00:07:13,784  INFO      Conexiones cerradas.

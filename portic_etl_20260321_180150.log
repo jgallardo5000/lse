@@ -1,0 +1,26 @@
+2026-03-21 18:01:51,048  INFO      Conexión Oracle (Thin mode) establecida correctamente.
+2026-03-21 18:01:51,089  INFO      Conexión PostgreSQL establecida correctamente.
+2026-03-21 18:01:51,089  INFO      PASO 1 — Consultando mensajes COPRAR en Oracle…
+2026-03-21 18:02:29,775  INFO      PASO 2 — Consultando equipamientos para ID_INTERNO=685309…
+2026-03-21 18:02:29,898  INFO        → 5 equipamientos recuperados de Oracle.
+2026-03-21 18:02:29,913  INFO        → DELETE equipamientos_escala WHERE escala=82507: 0 filas eliminadas.
+2026-03-21 18:02:29,916  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 18:02:29,921  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 18:02:29,922  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 18:02:29,923  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 18:02:29,923  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 18:02:29,924  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 18:02:29,924  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 18:02:29,925  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 18:02:29,925  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 18:02:29,925  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 18:02:29,928  INFO      PASO 2 completado y cambios confirmados en PostgreSQL.
+2026-03-21 18:02:29,928  INFO      PASO 3 — borra partidas para escala=82507…
+2026-03-21 18:02:29,929  ERROR     Error inesperado: 'int' object does not support indexing
+Traceback (most recent call last):
+  File "/Users/jgportic/Development/MyDevelopmet/Antigravity/lse/portic_etl.py", line 437, in main
+    paso3_cargar_partidas(ora_conn, pg_conn, int(id_interno), port_call_number)
+  File "/Users/jgportic/Development/MyDevelopmet/Antigravity/lse/portic_etl.py", line 273, in paso3_cargar_partidas
+    cur_pg.execute(
+TypeError: 'int' object does not support indexing
+2026-03-21 18:02:29,986  INFO      Conexiones cerradas.

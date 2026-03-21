@@ -1,0 +1,19 @@
+2026-03-20 23:03:45,046  INFO      Conexión Oracle (Thin mode) establecida correctamente.
+2026-03-20 23:03:45,098  INFO      Conexión PostgreSQL establecida correctamente.
+2026-03-20 23:03:45,098  INFO      PASO 1 — Consultando mensajes COPRAR en Oracle…
+2026-03-20 23:04:14,582  INFO      PASO 2 — Consultando equipamientos para ID_INTERNO=685224…
+2026-03-20 23:04:14,615  WARNING   No se encontraron equipamientos para ID_INTERNO=685224.
+2026-03-20 23:04:14,616  INFO      PASO 3 — Cargando partidas para escala=y…
+2026-03-20 23:04:14,624  ERROR     Error inesperado: invalid input syntax for type bigint: "y"
+LINE 1: ...CT equipamiento FROM equipamientos_escala WHERE escala = 'y'
+                                                                    ^
+Traceback (most recent call last):
+  File "/Users/jgportic/Development/MyDevelopmet/Antigravity/lse/portic_etl.py", line 406, in main
+    paso3_cargar_partidas(ora_conn, pg_conn, port_call_number)
+  File "/Users/jgportic/Development/MyDevelopmet/Antigravity/lse/portic_etl.py", line 271, in paso3_cargar_partidas
+    cur_pg.execute(
+psycopg2.errors.InvalidTextRepresentation: invalid input syntax for type bigint: "y"
+LINE 1: ...CT equipamiento FROM equipamientos_escala WHERE escala = 'y'
+                                                                    ^
+
+2026-03-20 23:04:14,723  INFO      Conexiones cerradas.

@@ -1,0 +1,113 @@
+2026-03-21 00:16:03,456  INFO      Conexión Oracle (Thin mode) establecida correctamente.
+2026-03-21 00:16:03,583  INFO      Conexión PostgreSQL establecida correctamente.
+2026-03-21 00:16:03,584  INFO      PASO 1 — Consultando mensajes COPRAR en Oracle…
+2026-03-21 00:16:40,644  INFO      PASO 2 — Consultando equipamientos para ID_INTERNO=685236…
+2026-03-21 00:16:41,047  INFO        → 50 equipamientos recuperados de Oracle.
+2026-03-21 00:16:41,055  INFO        → DELETE equipamientos_escala WHERE escala=82784: 0 filas eliminadas.
+2026-03-21 00:16:41,057  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,059  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,060  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,063  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,064  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,065  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,065  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,066  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,066  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,066  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,066  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,067  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,067  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,067  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,068  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,068  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,068  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,068  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,069  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,069  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,070  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,070  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,070  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,071  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,071  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,073  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,074  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,074  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,075  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,076  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,076  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,077  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,077  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,078  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,078  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,079  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,079  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,079  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,080  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,080  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,080  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,080  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,081  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,081  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,081  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,082  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,082  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,082  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,082  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,083  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,083  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,083  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,084  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,084  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,084  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,085  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,085  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,085  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,086  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,086  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,086  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,087  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,087  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,087  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,088  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,088  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,088  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,089  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,089  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,091  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,091  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,091  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,092  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,092  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,092  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,092  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,093  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,093  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,094  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,094  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,094  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,095  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,095  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,095  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,096  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,096  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,096  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,097  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,097  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,098  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,098  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,098  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,099  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,100  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,100  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,100  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,100  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,101  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,101  INFO      equipamientos insertados en equipamientos_escala.
+2026-03-21 00:16:41,101  INFO        → 1 filas actualizadas con tara desde tabla taras.
+2026-03-21 00:16:41,103  INFO      PASO 2 completado y cambios confirmados en PostgreSQL.
+2026-03-21 00:16:41,103  INFO      PASO 3 — Cargando partidas para escala=82784…
+2026-03-21 00:16:41,103  INFO        → 50 equipamientos a procesar.
+2026-03-21 00:16:41,104  INFO        → Consultando bloque de 50 equipamientos en Oracle…
+2026-03-21 00:16:41,338  INFO        ✓ Recibidas 48 partidas de Oracle. Insertando en Postgres…
+2026-03-21 00:16:41,347  INFO      PASO 3 completado. Total partidas insertadas: 48
+2026-03-21 00:16:41,424  INFO      Conexiones cerradas.
