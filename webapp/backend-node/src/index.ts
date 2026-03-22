@@ -23,12 +23,13 @@ app.use(morgan('dev'));
  * Step 1: Get messages (REAL LOGIC).
  */
 app.get('/messages', async (req: Request, res: Response) => {
-  console.log("GET /messages called - querying Oracle");
+  const { escala } = req.query;
+  console.log(`GET /messages called - querying Oracle for escala=${escala || 'ALL'}`);
 
   let conn;
   try {
     conn = await getOracleConnection();
-    const sql = `
+    let sql = `
       SELECT cm.ID_INTERNO,
              cm.MESSAGE_DATE,
              cm.PORT_CALL_NUMBER,
@@ -38,11 +39,17 @@ app.get('/messages', async (req: Request, res: Response) => {
         AND  cm.CONTAINER_LIST_TYPE = '121'
         AND  cm.CONTAINER_LIST_TARGET = 'COPORD'
         AND  cm.ESTADO              = 'OKSI'
-        AND  cm.MESSAGE_DATE        > SYSDATE - 5
-        AND  ROWNUM                 < 10
     `;
 
-    const result = await conn.execute<any[]>(sql, [], { outFormat: oracledb.OUT_FORMAT_OBJECT });
+    const binds: any = [];
+    if (!escala) {
+      return res.json([]);
+    }
+    
+    sql += ` AND cm.PORT_CALL_NUMBER = :escala`;
+    binds.push(escala);
+
+    const result = await conn.execute<any[]>(sql, binds, { outFormat: oracledb.OUT_FORMAT_OBJECT });
     res.json(result.rows);
   } catch (err) {
     console.error("Error in GET /messages:", err);

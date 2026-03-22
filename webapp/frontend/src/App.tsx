@@ -51,6 +51,7 @@ function App() {
   const [activeResultsTab, setActiveResultsTab] = useState<'step4' | 'step5'>('step5');
   const [step7Data, setStep7Data] = useState<Step7Data[]>([]);
   const [selectedCompareId, setSelectedCompareId] = useState<string | null>(null);
+  const [escalaSearch, setEscalaSearch] = useState('');
 
   const stats = useMemo(() => {
     let s5OK = 0;
@@ -128,20 +129,29 @@ function App() {
     }
   }, [selectedCompareId]);
 
-  useEffect(() => {
-    if (step === 1) {
-      fetchMessages();
-    }
-  }, [step]);
+  // Automatically fetch messages on mount? User says NO, wait for input.
+  // useEffect(() => {
+  //   if (step === 1 && !escalaSearch) {
+  //     fetchMessages();
+  //   }
+  // }, [step]);
 
-  const fetchMessages = async () => {
+  const fetchMessages = async (escala?: string) => {
+    if (!escala) {
+      setStatus({ type: 'error', message: 'Please enter a Scale Number to search.' });
+      return;
+    }
     setLoading(true);
     setStatus(null);
     try {
-      const res = await fetch(`${API_BASE}/messages`);
+      const url = escala ? `${API_BASE}/messages?escala=${escala}` : `${API_BASE}/messages`;
+      const res = await fetch(url);
       if (!res.ok) throw new Error('Backend error');
       const data = await res.json();
       setMessages(data);
+      if (escala && data.length === 0) {
+        setStatus({ type: 'info', message: `No messages found for scale ${escala}` });
+      }
     } catch (err) {
       console.error(err);
       setStatus({ type: 'error', message: 'Unable to reach backend or Oracle. Please ensure servers are running.' });
@@ -153,6 +163,9 @@ function App() {
   const handleSelect = (msg: Message) => {
     setSelectedId(msg.ID_INTERNO);
     setPcn(msg.PORT_CALL_NUMBER);
+    if (msg.NUM_CONTENEDORES) {
+      setMaxReg(msg.NUM_CONTENEDORES);
+    }
   };
 
   const handleStep2Submit = async (e: React.FormEvent) => {
@@ -364,15 +377,34 @@ function App() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <div>
               <h2>Step 1: Select Message</h2>
-              <p className="subtitle">Recent COPRAR messages from Oracle</p>
+              <p className="subtitle">Search and select COPRAR message from Oracle</p>
             </div>
-            <button 
-              className="btn btn-primary" 
-              disabled={(!selectedId || !pcn) || loading}
-              onClick={() => setStep(2)}
-            >
-              Continue to Step 2
-            </button>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <div className="search-group" style={{ display: 'flex', gap: '0.5rem' }}>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="Numero de Escala..." 
+                  value={escalaSearch}
+                  onChange={(e) => setEscalaSearch(e.target.value)}
+                  style={{ width: '200px', marginBottom: 0 }}
+                />
+                <button 
+                  className="btn btn-primary" 
+                  onClick={() => fetchMessages(escalaSearch)}
+                  disabled={loading}
+                >
+                  Search
+                </button>
+              </div>
+              <button 
+                className="btn btn-primary" 
+                disabled={(!selectedId || !pcn) || loading}
+                onClick={() => setStep(2)}
+              >
+                Continue to Step 2
+              </button>
+            </div>
           </div>
           
           {loading ? (
