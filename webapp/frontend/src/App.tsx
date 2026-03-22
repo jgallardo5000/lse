@@ -44,7 +44,7 @@ function App() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [maxReg, setMaxReg] = useState(10);
   const [pcn, setPcn] = useState('');
-  const [status, setStatus] = useState<{type: string, message: string} | null>(null);
+  const [status, setStatus] = useState<{ type: string, message: string } | null>(null);
   const [resEquipments, setResEquipments] = useState<EquipmentResult[]>([]);
   const [resPartidas, setResPartidas] = useState<PartidaResult[]>([]);
   const [validationDetail, setValidationDetail] = useState<any[]>([]);
@@ -75,7 +75,7 @@ function App() {
       if (Math.abs(netWeight - sumPartidas) <= (netWeight * 0.1)) s4OK++;
       else s4KO++;
     });
- 
+
     let s7OK = 0;
     let s7KO = 0;
     step7Data.forEach(eq => {
@@ -207,9 +207,9 @@ function App() {
       const res = await fetch(`${API_BASE}/load-partidas`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           id_interno: selectedId,
-          port_call_number: pcn 
+          port_call_number: pcn
         })
       });
       const data = await res.json();
@@ -239,7 +239,7 @@ function App() {
         fetch(`${API_BASE}/results/validated?escala=${pcn}&id_lista=${selectedId}`)
       ]);
       const [eData, pData, vData] = await Promise.all([eRes.json(), pRes.json(), vRes.json()]);
-      
+
       setResEquipments((eData || []).sort((a: any, b: any) => (a.equipamiento || "").localeCompare(b.equipamiento || "")));
       setResPartidas(pData);
       setValidationDetail((vData.detalle || []).sort((a: any, b: any) => (a.contenedorId || "").localeCompare(b.contenedorId || "")));
@@ -288,18 +288,18 @@ function App() {
         body: JSON.stringify({ num_escala: pcn })
       });
       const loadData = await loadRes.json();
-      
+
       if (loadData.status === 'success' || loadData.status === 'warning') {
-        setStatus({ 
-          type: loadData.status === 'success' ? 'success' : 'info', 
-          message: loadData.message || `Step 7 ETL Completed: ${loadData.equipmentsCount} equipments migrated.` 
+        setStatus({
+          type: loadData.status === 'success' ? 'success' : 'info',
+          message: loadData.message || `Step 7 ETL Completed: ${loadData.equipmentsCount} equipments migrated.`
         });
 
         // 2. Fetch Results
         const res = await fetch(`${API_BASE}/step7/results?escala=${pcn}`);
         const data = await res.json();
         setStep7Data(data);
-        
+
         setTimeout(() => setStep(7), 1500);
       } else {
         setStatus({ type: 'error', message: loadData.error || 'Failed to execute Step 7' });
@@ -328,7 +328,7 @@ function App() {
 
       const s5Result = validationDetail.find(d => d.contenedorId === eq.equipamiento);
       const s5Status = s5Result ? s5Result.estado : 'N/A';
-      
+
       // For Step 5, % diff is a bit more complex (might be group based), but we'll show the individual container's "desvío" if possible.
       // For now, let's use the same logic or the algorithm's reported diff if we had it.
       // Since 'validar' returns 'motivo' with diff, we'll estimate it for simplicity in the table.
@@ -362,7 +362,7 @@ function App() {
       </div>
 
       {status && (
-        <div className="glass-card fade-in" style={{ 
+        <div className="glass-card fade-in" style={{
           borderColor: status.type === 'error' ? '#ef4444' : status.type === 'success' ? '#10b981' : '#3b82f6',
           marginBottom: '1.5rem',
           padding: '1rem',
@@ -381,24 +381,24 @@ function App() {
             </div>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
               <div className="search-group" style={{ display: 'flex', gap: '0.5rem' }}>
-                <input 
-                  type="text" 
-                  className="form-input" 
-                  placeholder="Numero de Escala..." 
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Numero de Escala..."
                   value={escalaSearch}
                   onChange={(e) => setEscalaSearch(e.target.value)}
                   style={{ width: '200px', marginBottom: 0 }}
                 />
-                <button 
-                  className="btn btn-primary" 
+                <button
+                  className="btn btn-primary"
                   onClick={() => fetchMessages(escalaSearch)}
                   disabled={loading}
                 >
                   Search
                 </button>
               </div>
-              <button 
-                className="btn btn-primary" 
+              <button
+                className="btn btn-primary"
                 disabled={(!selectedId || !pcn) || loading}
                 onClick={() => setStep(2)}
               >
@@ -406,7 +406,7 @@ function App() {
               </button>
             </div>
           </div>
-          
+
           {loading ? (
             <div style={{ textAlign: 'center', padding: '2rem' }}>
               <div className="loader"></div> Loading messages...
@@ -425,8 +425,8 @@ function App() {
                   </thead>
                   <tbody>
                     {messages.map((msg) => (
-                      <tr 
-                        key={msg.ID_INTERNO} 
+                      <tr
+                        key={msg.ID_INTERNO}
                         className={selectedId === msg.ID_INTERNO ? 'selected' : ''}
                         onClick={() => handleSelect(msg)}
                       >
@@ -450,20 +450,20 @@ function App() {
                 <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                   <div className="form-group" style={{ flex: 1 }}>
                     <label>Manual ID_INTERNO</label>
-                    <input 
-                      className="form-input" 
-                      type="number" 
-                      value={selectedId || ''} 
-                      onChange={(e) => setSelectedId(parseInt(e.target.value))} 
+                    <input
+                      className="form-input"
+                      type="number"
+                      value={selectedId || ''}
+                      onChange={(e) => setSelectedId(parseInt(e.target.value))}
                       placeholder="Ex: 56789"
                     />
                   </div>
                   <div className="form-group" style={{ flex: 1 }}>
                     <label>Manual Port Call Number</label>
-                    <input 
-                      className="form-input" 
-                      value={pcn} 
-                      onChange={(e) => setPcn(e.target.value)} 
+                    <input
+                      className="form-input"
+                      value={pcn}
+                      onChange={(e) => setPcn(e.target.value)}
                       placeholder="Ex: 20240123"
                     />
                   </div>
@@ -491,30 +491,30 @@ function App() {
               </button>
             </div>
           </div>
-          
+
           <form id="step2Form" onSubmit={handleStep2Submit} style={{ marginTop: '1.5rem' }}>
             <div className="form-group">
               <label>Selected ID_INTERNO</label>
               <input className="form-input" value={selectedId || ''} disabled />
             </div>
-            
+
             <div className="form-group">
               <label>Port Call Number (PCN)</label>
-              <input 
-                className="form-input" 
-                value={pcn} 
-                onChange={(e) => setPcn(e.target.value)} 
+              <input
+                className="form-input"
+                value={pcn}
+                onChange={(e) => setPcn(e.target.value)}
                 placeholder="Ex: 20240123"
               />
             </div>
 
             <div className="form-group">
               <label>Max Registros</label>
-              <input 
-                type="number" 
-                className="form-input" 
-                value={maxReg} 
-                onChange={(e) => setMaxReg(parseInt(e.target.value))} 
+              <input
+                type="number"
+                className="form-input"
+                value={maxReg}
+                onChange={(e) => setMaxReg(parseInt(e.target.value))}
                 min="1"
               />
             </div>
@@ -539,11 +539,11 @@ function App() {
               </button>
             </div>
           </div>
-          
+
           <div style={{ marginTop: '1.5rem', background: 'rgba(255,255,255,0.05)', padding: '1.5rem', borderRadius: '12px' }}>
             <p><strong>Processing PCN:</strong> {pcn}</p>
             <p style={{ marginTop: '0.5rem', color: '#9ca3af' }}>
-              This step will retrieve all equipamientos associated with this scale in PostgreSQL 
+              This step will retrieve all equipamientos associated with this scale in PostgreSQL
               and fetch their corresponding partidas and events from Oracle.
             </p>
           </div>
@@ -556,19 +556,19 @@ function App() {
             <div>
               <h2>Step 4: ETL Results</h2>
               <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-                <button 
+                <button
                   className={`btn ${activeResultsTab === 'step4' ? 'btn-primary' : ''}`}
                   onClick={() => setActiveResultsTab('step4')}
                   style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}
                 >
-                  Vista Básica (Piso 4)
+                  Vista Básica (Paso 4)
                 </button>
-                <button 
+                <button
                   className={`btn ${activeResultsTab === 'step5' ? 'btn-primary' : ''}`}
                   onClick={() => setActiveResultsTab('step5')}
                   style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}
                 >
-                  Algoritmo Avanzado (Piso 5)
+                  Algoritmo Avanzado (Paso 5)
                 </button>
               </div>
             </div>
@@ -590,7 +590,7 @@ function App() {
               </button>
             </div>
           </div>
-          
+
           <div style={{ marginTop: '1rem' }}>
             {activeResultsTab === 'step5' ? (
               // Step 5 View (Algorithm)
@@ -608,7 +608,7 @@ function App() {
                 const myUniquePartidas = Object.values(uniqueMap);
 
                 return (
-                  <div key={d.contenedorId} className="result-card" style={{ 
+                  <div key={d.contenedorId} className="result-card" style={{
                     borderLeft: `4px solid ${d.estado === 'OK' ? '#10b981' : d.estado === 'WARN' ? '#f59e0b' : '#ef4444'}`
                   }}>
                     <div className="result-header">
@@ -625,18 +625,18 @@ function App() {
                     <p className="motivo"><strong>Motivo:</strong> {d.motivo}</p>
 
                     {d.grupoContenedores && d.grupoContenedores.length > 1 && (
-                      <div className="group-info" style={{ 
-                        marginTop: '1rem', 
-                        padding: '1rem', 
-                        background: 'rgba(59,130,246,0.05)', 
+                      <div className="group-info" style={{
+                        marginTop: '1rem',
+                        padding: '1rem',
+                        background: 'rgba(59,130,246,0.05)',
                         borderRadius: '12px',
                         border: '1px solid rgba(59,130,246,0.2)'
                       }}>
                         <h4 style={{ color: '#60a5fa', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Contenedores Relacionados (Grupo)</h4>
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                           {d.grupoContenedores.map((cid: string) => (
-                            <span key={cid} style={{ 
-                              padding: '0.2rem 0.6rem', 
+                            <span key={cid} style={{
+                              padding: '0.2rem 0.6rem',
                               background: cid === d.contenedorId ? '#3b82f6' : 'rgba(255,255,255,0.1)',
                               borderRadius: '6px',
                               fontSize: '0.8rem',
@@ -697,7 +697,7 @@ function App() {
                 const isOK = Math.abs(netWeight - sumPartidas) <= (netWeight * 0.1);
 
                 return (
-                  <div key={eq.id} className="result-card" style={{ 
+                  <div key={eq.id} className="result-card" style={{
                     borderLeft: `4px solid ${isOK ? '#10b981' : '#ef4444'}`
                   }}>
                     <div className="result-header">
@@ -897,8 +897,8 @@ function App() {
               </thead>
               <tbody>
                 {comparisonData.map(row => (
-                  <tr 
-                    key={row.id} 
+                  <tr
+                    key={row.id}
                     onClick={() => {
                       setSelectedCompareId(row.id);
                       setStep(9);
@@ -948,15 +948,15 @@ function App() {
               <p className="subtitle" style={{ marginTop: '0.5rem' }}>Análisis completo de las tres fuentes de datos (Básica, Avanzada y LSP)</p>
             </div>
             <div style={{ display: 'flex', gap: '1rem' }}>
-              <button 
-                className="btn" 
-                onClick={() => setStep(6)} 
+              <button
+                className="btn"
+                onClick={() => setStep(6)}
                 style={{ color: 'white', background: 'rgba(255,255,255,0.05)' }}
               >
                 Volver a Resumen (Paso 6)
               </button>
-              <button 
-                className="btn btn-primary" 
+              <button
+                className="btn btn-primary"
                 onClick={() => setStep(8)}
               >
                 Volver a Comparación (Paso 8)
@@ -1008,7 +1008,7 @@ function App() {
                         <p className={isOK ? 'status-ok' : 'status-ko'}>{isOK ? 'OK' : 'KO'}</p>
                       </div>
                     </div>
-                    
+
                     <h4 style={{ marginBottom: '1rem', color: 'var(--text-secondary)' }}>Partidas y Eventos Detectados</h4>
                     <div className="table-responsive">
                       <table className="data-table compact">
@@ -1072,7 +1072,7 @@ function App() {
                         <p className={`status-${d.estado.toLowerCase()}`}>{d.estado}</p>
                       </div>
                     </div>
-                    
+
                     <div style={{ marginBottom: '2rem', padding: '1.2rem', background: 'rgba(245,158,11,0.05)', borderRadius: '12px', border: '1px solid rgba(245,158,11,0.2)' }}>
                       <h4 style={{ color: '#fbbf24', marginBottom: '0.5rem' }}>Motivo de la Validación</h4>
                       <p style={{ fontSize: '1rem', color: '#f3f4f6', lineHeight: '1.5' }}>{d.motivo}</p>
@@ -1084,14 +1084,14 @@ function App() {
                           <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#60a5fa' }}></span>
                           Componentes del Grupo (Asociación por Peso)
                         </h4>
-                        
+
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
                           <div>
                             <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Contenedores Participantes:</p>
                             <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
                               {d.grupoContenedores.map((cid: string) => (
-                                <div key={cid} style={{ 
-                                  padding: '0.4rem 0.8rem', 
+                                <div key={cid} style={{
+                                  padding: '0.4rem 0.8rem',
                                   background: cid === selectedCompareId ? '#3b82f6' : 'rgba(255,255,255,0.05)',
                                   borderRadius: '8px',
                                   border: `1px solid ${cid === selectedCompareId ? '#3b82f6' : 'rgba(255,255,255,0.1)'}`,
@@ -1117,10 +1117,10 @@ function App() {
                             <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Partidas Compartidas:</p>
                             <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
                               {d.grupoPartidas?.map((pid: string) => (
-                                <div key={pid} style={{ 
-                                  padding: '0.4rem 0.8rem', 
+                                <div key={pid} style={{
+                                  padding: '0.4rem 0.8rem',
                                   background: 'rgba(245,158,11,0.1)',
-                                  borderRadius: '8px', 
+                                  borderRadius: '8px',
                                   border: '1px solid rgba(245,158,11,0.2)',
                                   color: '#fbbf24',
                                   fontSize: '0.9rem'
@@ -1144,7 +1144,7 @@ function App() {
                             })()}
                           </div>
                         </div>
-                        
+
                         <p style={{ marginTop: '1.5rem', fontSize: '0.8rem', color: '#9ca3af', fontStyle: 'italic' }}>
                           * El algoritmo ha verificado que la **Suma de Porciones** ({
                             validationDetail

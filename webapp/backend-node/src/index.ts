@@ -38,15 +38,16 @@ app.get('/messages', async (req: Request, res: Response) => {
       WHERE  cm.RECEIVER_UNB       = 'ESQ0817002I'
         AND  cm.CONTAINER_LIST_TYPE = '121'
         AND  cm.CONTAINER_LIST_TARGET = 'COPORD'
-        AND  cm.ESTADO              = 'OKSI'
+        AND  CM.MESSAGE_FUNCTION <>'1'
+        AND  cm.ESTADO = 'OKSI'
     `;
 
     const binds: any = [];
     if (!escala) {
       return res.json([]);
     }
-    
-    sql += ` AND cm.PORT_CALL_NUMBER = :escala`;
+
+    sql += ` AND cm.PORT_CALL_NUMBER = :escala ORDER BY cm.ID_INTERNO desc`;
     binds.push(escala);
 
     const result = await conn.execute<any[]>(sql, binds, { outFormat: oracledb.OUT_FORMAT_OBJECT });
@@ -458,7 +459,7 @@ app.get('/step7/results', async (req: Request, res: Response) => {
     `;
 
     const result = await pg.query(sql, [escala]);
-    
+
     // Transform to hierarchy
     const hierarchy: any[] = [];
     const eqMap = new Map<string, any>();
@@ -469,12 +470,12 @@ app.get('/step7/results', async (req: Request, res: Response) => {
           id: r.equipment_id,
           equipamiento: r.equipamiento,
           estado: r.estado,
-          datos: r.numdoc ? [] : [] 
+          datos: r.numdoc ? [] : []
         };
         eqMap.set(r.equipamiento, eq);
         hierarchy.push(eq);
       }
-      
+
       if (r.numdoc) {
         eqMap.get(r.equipamiento).datos.push({
           numdoc: r.numdoc,
