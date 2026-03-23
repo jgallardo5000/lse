@@ -94,7 +94,7 @@ app.post('/load-equipments', async (req: Request<{}, {}, LoadEquipmentsRequest>,
     const rows = resultOra.rows || [];
 
     if (rows.length === 0) {
-      return res.json({ status: "warning", message: "No equipments found in Oracle", count: 0 });
+      return res.json({ status: "warning", message: "No equipments found in Oracle O sin peso verificado", count: 0 });
     }
 
     // 2b. Delete previous PG records
@@ -116,7 +116,7 @@ app.post('/load-equipments', async (req: Request<{}, {}, LoadEquipmentsRequest>,
         EQUIPMENT_TYPE,
         Math.round(VGM_PESO_VERIFICADO || 0)
       ]);
-
+      // incorporar tara desde la tabla taras
       const updateSql = `
         UPDATE equipamientos_escala ee
         SET    tara = t.peso
@@ -237,7 +237,11 @@ app.post('/load-partidas', async (req: Request<{}, {}, ProcessPartidasRequest>, 
         AND (
           nombre_evento ILIKE '%interrupcion%' OR 
           nombre_evento ILIKE '%anulacion%' OR 
-          nombre_evento ILIKE '%salida efectiva%' OR
+          nombre_evento ILIKE '%Archivo%' OR
+          nombre_evento ILIKE '%Reactivacion%' OR
+          nombre_evento ILIKE 'Modficiacion' OR
+          nombre_evento ILIKE '%Recepcion despachada%' OR
+          nombre_evento ILIKE '%cancelacion%' OR
           nombre_evento ILIKE '%llegada%'
         )
     `;
@@ -261,6 +265,18 @@ app.post('/load-partidas', async (req: Request<{}, {}, ProcessPartidasRequest>, 
       )
     `;
     await pg.query(dedupeSql, [port_call_number]);
+
+    const updateUnwantedSql2 = `
+      UPDATE partidas_equipamiento 
+      SET peso = 0
+      WHERE escala = $1 and idlista = $2
+        AND (
+          nombre_evento ILIKE '%salida efectiva%'
+        )
+    `;
+    
+    await pg.query(updateUnwantedSql2, [port_call_number, id_interno]);
+    console.log('Cleanup completed')
 
     res.json({ status: "success", count: totalInserted, mode: "real", message: "Step 3 completed with cleanup" });
   } catch (err) {
@@ -391,6 +407,7 @@ app.post('/step7/load', async (req: Request<{}, {}, Step7Request>, res: Response
              portic.COPRAR_LSP_DATOS cld 
       WHERE  clm.ESCALA = :escala
         AND  cld.ID_SEQ = clm.ID_SEQ
+        AND  cld.peso is not null
     `;
 
     const resultOra = await oraConn.execute<any[]>(sqlOra, [num_escala], { outFormat: oracledb.OUT_FORMAT_OBJECT });

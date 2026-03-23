@@ -70,7 +70,7 @@ function App() {
         const ex = uniqueMap[p.id_documento_partida];
         if (!ex || new Date(p.fecha_evento) > new Date(ex.fecha_evento)) uniqueMap[p.id_documento_partida] = p;
       });
-      const sumPartidas = Object.values(uniqueMap).reduce((acc: number, p: any) => acc + (p.peso || 0), 0);
+      const sumPartidas = Object.values(uniqueMap).reduce((acc: number, p: any) => acc + Number(p.peso || 0), 0);
       const netWeight = (eq.peso || 0) - (eq.tara || 0);
       if (Math.abs(netWeight - sumPartidas) <= (netWeight * 0.1)) s4OK++;
       else s4KO++;
@@ -102,7 +102,7 @@ function App() {
         const ex = uniqueMap[p.id_documento_partida];
         if (!ex || new Date(p.fecha_evento) > new Date(ex.fecha_evento)) uniqueMap[p.id_documento_partida] = p;
       });
-      const sumPartidas = Object.values(uniqueMap).reduce((acc: number, p: any) => acc + (p.weight || p.peso || 0), 0);
+      const sumPartidas = Object.values(uniqueMap).reduce((acc: number, p: any) => acc + Number(p.weight || p.peso || 0), 0);
       const netWeight = eq4 ? (eq4.peso || 0) - (eq4.tara || 0) : 0;
       const s4Status = eq4 ? (Math.abs(netWeight - sumPartidas) <= (netWeight * 0.1) ? 'OK' : 'KO') : 'N/A';
 
@@ -116,6 +116,7 @@ function App() {
 
       return {
         id,
+        netWeight,
         s4Status,
         s5Status,
         s7Status
@@ -320,7 +321,7 @@ function App() {
         const ex = uniqueMap[p.id_documento_partida];
         if (!ex || new Date(p.fecha_evento) > new Date(ex.fecha_evento)) uniqueMap[p.id_documento_partida] = p;
       });
-      const sumPartidas = Object.values(uniqueMap).reduce((acc: number, p: any) => acc + (p.peso || 0), 0);
+      const sumPartidas = Object.values(uniqueMap).reduce((acc: number, p: any) => acc + Number(p.peso || 0), 0);
       const netWeight = (eq.peso || 0) - (eq.tara || 0);
       const s4Diff = Math.abs(netWeight - sumPartidas);
       const s4DiffPct = netWeight > 0 ? (s4Diff / netWeight) * 100 : 0;
@@ -692,7 +693,7 @@ function App() {
                   if (!ex || new Date(p.fecha_evento) > new Date(ex.fecha_evento)) uniqueMap[p.id_documento_partida] = p;
                 });
                 const myUniquePartidas = Object.values(uniqueMap);
-                const sumPartidas = myUniquePartidas.reduce((acc: number, p: any) => acc + (p.peso || 0), 0);
+                const sumPartidas = myUniquePartidas.reduce((acc: number, p: any) => acc + Number(p.peso || 0), 0);
                 const netWeight = (eq.peso || 0) - (eq.tara || 0);
                 const isOK = Math.abs(netWeight - sumPartidas) <= (netWeight * 0.1);
 
@@ -826,8 +827,15 @@ function App() {
               step7Data.map((eq) => (
                 <div key={eq.id} className="result-card" style={{ borderLeft: '4px solid #3b82f6', background: 'rgba(255,255,255,0.03)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <div style={{ display: 'flex', gap: '2rem' }}>
+                    <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
                       <p><strong>Equipamiento:</strong> <span className="highlight-blue">{eq.equipamiento}</span></p>
+                      {(() => {
+                        const baseEq = resEquipments.find(e => e.equipamiento === eq.equipamiento);
+                        const netWeight = baseEq ? (baseEq.peso - (baseEq.tara || 0)) : null;
+                        return netWeight !== null ? (
+                          <p><strong>Peso Neto:</strong> <span className="highlight-yellow">{netWeight} kg</span></p>
+                        ) : null;
+                      })()}
                       <p><strong>Estado:</strong> <span className={`status-${eq.estado.toLowerCase()}`}>{eq.estado}</span></p>
                     </div>
                     <span style={{ fontSize: '0.8rem', color: '#9ca3af' }}>ID: {eq.id}</span>
@@ -851,10 +859,32 @@ function App() {
                           ))}
                         </tbody>
                         <tfoot>
-                          <tr style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                            <td style={{ textAlign: 'right', fontWeight: 'bold' }}>Total Documentos:</td>
-                            <td style={{ fontWeight: 'bold' }}>{eq.datos.reduce((acc: number, curr: any) => acc + (curr.peso || 0), 0)} kg</td>
-                          </tr>
+                          {(() => {
+                            const totalDocs = eq.datos.reduce((acc: number, curr: any) => acc + Number(curr.peso || 0), 0);
+                            const baseEq = resEquipments.find(e => e.equipamiento === eq.equipamiento);
+                            const netWeight = baseEq ? (baseEq.peso - (baseEq.tara || 0)) : 0;
+                            const diff = Math.abs(totalDocs - netWeight);
+                            const isOK = netWeight > 0 ? (diff <= (netWeight * 0.1)) : true;
+
+                            return (
+                              <>
+                                <tr style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                                  <td style={{ textAlign: 'right', color: '#9ca3af' }}>Peso Neto Container (Ref):</td>
+                                  <td style={{ color: '#9ca3af' }}>{netWeight} kg</td>
+                                </tr>
+                                <tr>
+                                  <td style={{ textAlign: 'right', fontWeight: 'bold' }}>Total Documentos (LSP):</td>
+                                  <td style={{ fontWeight: 'bold' }}>{totalDocs} kg</td>
+                                </tr>
+                                <tr style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                                  <td style={{ textAlign: 'right', fontWeight: 'bold' }}>Diferencia:</td>
+                                  <td style={{ fontWeight: 'bold', color: isOK ? '#10b981' : '#ef4444' }}>
+                                    {diff.toFixed(2)} kg ({netWeight > 0 ? ((diff / netWeight) * 100).toFixed(2) : 0}%)
+                                  </td>
+                                </tr>
+                              </>
+                            );
+                          })()}
                         </tfoot>
                       </table>
                     </div>
@@ -890,6 +920,7 @@ function App() {
               <thead>
                 <tr>
                   <th>Contenedor</th>
+                  <th>Peso Neto</th>
                   <th>Básica (Paso 4)</th>
                   <th>Avanzada (Paso 5)</th>
                   <th>LSP (Paso 7 - PG)</th>
@@ -906,6 +937,7 @@ function App() {
                     style={{ cursor: 'pointer' }}
                   >
                     <td><span className="highlight-blue" style={{ fontWeight: selectedCompareId === row.id ? 'bold' : 'normal' }}>{row.id}</span></td>
+                    <td>{row.netWeight ? `${row.netWeight} kg` : '-'}</td>
                     <td>
                       <span className={row.s4Status === 'OK' ? 'status-ok' : row.s4Status === 'N/A' ? '' : 'status-ko'}>
                         {row.s4Status}
@@ -980,7 +1012,7 @@ function App() {
                   if (!ex || new Date(p.fecha_evento) > new Date(ex.fecha_evento)) uniqueMap[p.id_documento_partida] = p;
                 });
                 const myUniquePartidas = Object.values(uniqueMap);
-                const sumPartidas = myUniquePartidas.reduce((acc: number, p: any) => acc + (p.peso || 0), 0);
+                const sumPartidas = myUniquePartidas.reduce((acc: number, p: any) => acc + Number(p.peso || 0), 0);
                 const netWeight = eq ? (eq.peso - (eq.tara || 0)) : 0;
                 const isOK = Math.abs(netWeight - sumPartidas) <= (netWeight * 0.1);
 
@@ -1104,7 +1136,7 @@ function App() {
                             {(() => {
                               const groupNetSum = validationDetail
                                 .filter(v => d.grupoContenedores.includes(v.contenedorId))
-                                .reduce((acc: number, v: any) => acc + (v.porcionCompartida || 0), 0);
+                                .reduce((acc: number, v: any) => acc + Number(v.porcionCompartida || 0), 0);
                               return (
                                 <div className="stat-box mini" style={{ background: 'rgba(59,130,246,0.1)' }}>
                                   <label style={{ fontSize: '0.75rem' }}>Suma Porciones Grupo</label>
@@ -1131,9 +1163,9 @@ function App() {
                             </div>
                             {(() => {
                               const uniqueGroupPartidas = Array.from(new Set(d.grupoPartidas)) as string[];
-                              const groupPartidasSum = uniqueGroupPartidas.reduce((acc: number, pid: string) => {
+                               const groupPartidasSum = uniqueGroupPartidas.reduce((acc: number, pid: string) => {
                                 const p = resPartidas.find(rp => rp.id_documento_partida === pid);
-                                return acc + (p?.peso || 0);
+                                return acc + Number(p?.peso || 0);
                               }, 0);
                               return (
                                 <div className="stat-box mini" style={{ background: 'rgba(245,158,11,0.1)' }}>
@@ -1149,11 +1181,11 @@ function App() {
                           * El algoritmo ha verificado que la **Suma de Porciones** ({
                             validationDetail
                               .filter(v => d.grupoContenedores.includes(v.contenedorId))
-                              .reduce((acc: number, v: any) => acc + (v.porcionCompartida || 0), 0).toFixed(0)
+                              .reduce((acc: number, v: any) => acc + Number(v.porcionCompartida || 0), 0).toFixed(0)
                           } kg) coincide con la **Suma de Partidas** ({
                             (Array.from(new Set(d.grupoPartidas)) as string[]).reduce((acc: number, pid: string) => {
-                              const p = resPartidas.find(rp => rp.id_documento_partida === pid);
-                              return acc + (p?.peso || 0);
+                               const p = resPartidas.find(rp => rp.id_documento_partida === pid);
+                              return acc + Number(p?.peso || 0);
                             }, 0)
                           } kg) dentro de la tolerancia del 10%.
                         </p>
@@ -1190,7 +1222,7 @@ function App() {
             <div className="detail-section" style={{ background: 'rgba(255,255,255,0.02)', padding: '2rem', borderRadius: '20px', border: '1px solid rgba(16,185,129,0.3)' }}>
               <h3 style={{ color: '#10b981', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.7rem', fontSize: '1.5rem' }}>
                 <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 10px #10b981' }}></span>
-                3. LSP (PostgreSQL Migrado)
+                3. LSP (APB Migrado)
               </h3>
               {(() => {
                 const eq = step7Data.find(e => e.equipamiento === selectedCompareId);
@@ -1207,8 +1239,27 @@ function App() {
                       </div>
                       <div className="stat-box">
                         <label>Total Peso Docs</label>
-                        <p className="highlight-yellow">{eq.datos.reduce((acc: number, curr: any) => acc + curr.peso, 0)} kg</p>
+                        <p className="highlight-yellow">{eq.datos.reduce((acc: number, curr: any) => acc + Number(curr.peso || 0), 0)} kg</p>
                       </div>
+                      {(() => {
+                        const baseEq = resEquipments.find(e => e.equipamiento === selectedCompareId);
+                        const netWeight = baseEq ? (baseEq.peso - (baseEq.tara || 0)) : 0;
+                        const totalDocs = eq.datos.reduce((acc: number, curr: any) => acc + Number(curr.peso || 0), 0);
+                        const diff = Math.abs(totalDocs - netWeight);
+                        const isOK = netWeight > 0 ? (diff <= (netWeight * 0.1)) : true;
+                        return (
+                          <>
+                            <div className="stat-box">
+                              <label>Peso Neto (Ref)</label>
+                              <p>{netWeight} kg</p>
+                            </div>
+                            <div className="stat-box">
+                              <label>Diferencia LSP</label>
+                              <p style={{ color: isOK ? 'var(--success-color)' : '#ef4444' }}>{diff.toFixed(2)} kg</p>
+                            </div>
+                          </>
+                        );
+                      })()}
                       <div className="stat-box">
                         <label>Num. Documentos</label>
                         <p>{eq.datos.length}</p>
