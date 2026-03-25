@@ -31,15 +31,38 @@ app.get('/messages', async (req: Request, res: Response) => {
     conn = await getOracleConnection();
     let sql = `
       SELECT cm.ID_INTERNO,
-             cm.MESSAGE_DATE,
-             cm.PORT_CALL_NUMBER,
-             cm.NUM_CONTENEDORES
-      FROM   PORTIC.COPRAR_MENSAJES cm
-      WHERE  cm.RECEIVER_UNB       = 'ESQ0817002I'
-        AND  cm.CONTAINER_LIST_TYPE = '121'
-        AND  cm.CONTAINER_LIST_TARGET = 'COPORD'
-        AND  CM.MESSAGE_FUNCTION <>'1'
-        AND  cm.ESTADO = 'OKSI'
+       cm.SENDER_NAD,
+       cm.MESSAGE_DATE,
+       cm.PORT_CALL_NUMBER,
+       cm.NUM_CONTENEDORES
+FROM   PORTIC.COPRAR_MENSAJES cm
+WHERE  cm.RECEIVER_UNB        = 'ESQ0817002I'
+  AND  cm.CONTAINER_LIST_TYPE = '121'
+  AND  cm.CONTAINER_LIST_TARGET = 'COPORD'
+  AND  cm.ESTADO = 'OKSI'
+  AND  cm.PORT_CALL_NUMBER = :escala
+  AND  cm.ID_INTERNO = (
+           SELECT MAX(cm2.ID_INTERNO)
+           FROM   PORTIC.COPRAR_MENSAJES cm2
+           WHERE  cm2.RECEIVER_UNB        = cm.RECEIVER_UNB
+             AND  cm2.CONTAINER_LIST_TYPE = cm.CONTAINER_LIST_TYPE
+             AND  cm2.CONTAINER_LIST_TARGET = cm.CONTAINER_LIST_TARGET
+             AND  cm2.ESTADO              = cm.ESTADO
+             AND  cm2.PORT_CALL_NUMBER    = cm.PORT_CALL_NUMBER
+             AND  cm2.SENDER_NAD          = cm.SENDER_NAD
+             AND  cm2.MESSAGE_DATE        = (
+                      SELECT MAX(cm3.MESSAGE_DATE)
+                      FROM   PORTIC.COPRAR_MENSAJES cm3
+                      WHERE  cm3.RECEIVER_UNB        = cm.RECEIVER_UNB
+                        AND  cm3.CONTAINER_LIST_TYPE = cm.CONTAINER_LIST_TYPE
+                        AND  cm3.CONTAINER_LIST_TARGET = cm.CONTAINER_LIST_TARGET
+                        AND  cm3.ESTADO              = cm.ESTADO
+                        AND  cm3.PORT_CALL_NUMBER    = cm.PORT_CALL_NUMBER
+                        AND  cm3.SENDER_NAD          = cm.SENDER_NAD
+                  )
+       )
+  AND  cm.MESSAGE_FUNCTION != '1' and cm.message_date > ADD_MONTHS(SYSDATE, -12)
+  order by cm.MESSAGE_DATE DESC
     `;
 
     const binds: any = [];
@@ -47,7 +70,6 @@ app.get('/messages', async (req: Request, res: Response) => {
       return res.json([]);
     }
 
-    sql += ` AND cm.PORT_CALL_NUMBER = :escala ORDER BY cm.ID_INTERNO desc`;
     binds.push(escala);
 
     const result = await conn.execute<any[]>(sql, binds, { outFormat: oracledb.OUT_FORMAT_OBJECT });
@@ -238,8 +260,8 @@ app.post('/load-partidas', async (req: Request<{}, {}, ProcessPartidasRequest>, 
           nombre_evento ILIKE '%interrupcion%' OR 
           nombre_evento ILIKE '%anulacion%' OR 
           nombre_evento ILIKE '%Archivo%' OR
-          nombre_evento ILIKE '%Reactivacion%' OR
-          nombre_evento ILIKE 'Modficiacion' OR
+          nombre_evento ILIKE '%reactivacion%' OR
+          nombre_evento ILIKE 'Modificacion' OR
           nombre_evento ILIKE '%Recepcion despachada%' OR
           nombre_evento ILIKE '%cancelacion%' OR
           nombre_evento ILIKE '%llegada%'
@@ -274,7 +296,7 @@ app.post('/load-partidas', async (req: Request<{}, {}, ProcessPartidasRequest>, 
           nombre_evento ILIKE '%salida efectiva%'
         )
     `;
-    
+
     await pg.query(updateUnwantedSql2, [port_call_number, id_interno]);
     console.log('Cleanup completed')
 

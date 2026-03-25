@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 
 interface Message {
   ID_INTERNO: number;
+  SENDER_NAD: string;
   MESSAGE_DATE: string;
   PORT_CALL_NUMBER: string;
   NUM_CONTENEDORES: number | null;
@@ -419,6 +420,7 @@ function App() {
                   <thead>
                     <tr>
                       <th>ID Interno</th>
+                      <th>Sender NAD</th>
                       <th>Date</th>
                       <th>Port Call</th>
                       <th>Containers</th>
@@ -432,6 +434,7 @@ function App() {
                         onClick={() => handleSelect(msg)}
                       >
                         <td>{msg.ID_INTERNO}</td>
+                        <td>{msg.SENDER_NAD}</td>
                         <td>{new Date(msg.MESSAGE_DATE).toLocaleDateString()}</td>
                         <td>{msg.PORT_CALL_NUMBER}</td>
                         <td>{msg.NUM_CONTENEDORES}</td>
