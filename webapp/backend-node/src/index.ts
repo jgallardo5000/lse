@@ -38,7 +38,6 @@ app.get('/messages', async (req: Request, res: Response) => {
 FROM   PORTIC.COPRAR_MENSAJES cm
 WHERE  cm.RECEIVER_UNB        = 'ESQ0817002I'
   AND  cm.CONTAINER_LIST_TYPE = '121'
-  AND  cm.CONTAINER_LIST_TARGET = 'COPORD'
   AND  cm.ESTADO = 'OKSI'
   AND  cm.PORT_CALL_NUMBER = :escala
   AND  cm.ID_INTERNO = (

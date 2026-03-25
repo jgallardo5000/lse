@@ -53,6 +53,7 @@ function App() {
   const [step7Data, setStep7Data] = useState<Step7Data[]>([]);
   const [selectedCompareId, setSelectedCompareId] = useState<string | null>(null);
   const [escalaSearch, setEscalaSearch] = useState('');
+  const [tolerancia, setTolerancia] = useState(10);
 
   // Helper: ID_INTERNO principal (el primero seleccionado, para compatibilidad con steps 3-7)
   const selectedId = selectedIds.length > 0 ? selectedIds[0] : null;
@@ -76,7 +77,7 @@ function App() {
       });
       const sumPartidas = Object.values(uniqueMap).reduce((acc: number, p: any) => acc + Number(p.peso || 0), 0);
       const netWeight = (eq.peso || 0) - (eq.tara || 0);
-      if (Math.abs(netWeight - sumPartidas) <= (netWeight * 0.1)) s4OK++;
+      if (Math.abs(netWeight - sumPartidas) <= (netWeight * (tolerancia / 100))) s4OK++;
       else s4KO++;
     });
 
@@ -88,7 +89,7 @@ function App() {
     });
 
     return { s5OK, s5KO, s4OK, s4KO, s7OK, s7KO };
-  }, [validationDetail, resEquipments, resPartidas, step7Data]);
+  }, [validationDetail, resEquipments, resPartidas, step7Data, tolerancia]);
 
   const comparisonData = useMemo(() => {
     // Collect all unique containers from all sources
@@ -264,14 +265,15 @@ function App() {
     }
   };
 
-  const fetchResults = async () => {
+  const fetchResults = async (tol?: number) => {
     if (!selectedId || !pcn) return;
+    const tolValue = tol !== undefined ? tol : tolerancia;
     setLoading(true);
     try {
       const [eRes, pRes, vRes] = await Promise.all([
         fetch(`${API_BASE}/results/equipments?escala=${pcn}`),
         fetch(`${API_BASE}/results/partidas?idlista=${selectedId}`),
-        fetch(`${API_BASE}/results/validated?escala=${pcn}&id_lista=${selectedId}`)
+        fetch(`${API_BASE}/results/validated?escala=${pcn}&id_lista=${selectedId}&tolerancia=${tolValue}`)
       ]);
       const [eData, pData, vData] = await Promise.all([eRes.json(), pRes.json(), vRes.json()]);
 
@@ -628,6 +630,27 @@ function App() {
               </div>
             </div>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              {/* Tolerancia */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.05)', padding: '0.4rem 0.8rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <span style={{ fontSize: '0.85rem', color: '#9ca3af', whiteSpace: 'nowrap' }}>Tolerancia:</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={tolerancia}
+                  onChange={(e) => setTolerancia(parseInt(e.target.value) || 0)}
+                  style={{ width: '54px', background: 'transparent', border: 'none', color: '#f9fafb', fontSize: '0.95rem', fontWeight: 'bold', textAlign: 'center', outline: 'none' }}
+                />
+                <span style={{ fontSize: '0.85rem', color: '#9ca3af' }}>%</span>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => fetchResults(tolerancia)}
+                  disabled={loading}
+                  style={{ padding: '0.25rem 0.75rem', fontSize: '0.8rem', marginLeft: '0.25rem' }}
+                >
+                  ↺
+                </button>
+              </div>
               <div className="summary-stat">
                 <span>TOTAL</span>
                 <span className="count">{activeResultsTab === 'step5' ? validationDetail.length : resEquipments.length}</span>
