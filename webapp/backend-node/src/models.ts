@@ -6,13 +6,13 @@ export interface Message {
 }
 
 export interface LoadEquipmentsRequest {
-  id_interno: number;
+  id_internos: number[];
   port_call_number: string;
   max_registros: number;
 }
 
 export interface ProcessPartidasRequest {
-  id_interno: number;
+  id_internos: number[];
   port_call_number: string;
 }
 

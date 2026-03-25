@@ -42,7 +42,7 @@ function App() {
   const [step, setStep] = useState(1);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [maxReg, setMaxReg] = useState(10);
   const [pcn, setPcn] = useState('');
   const [status, setStatus] = useState<{ type: string, message: string } | null>(null);
@@ -53,6 +53,9 @@ function App() {
   const [step7Data, setStep7Data] = useState<Step7Data[]>([]);
   const [selectedCompareId, setSelectedCompareId] = useState<string | null>(null);
   const [escalaSearch, setEscalaSearch] = useState('');
+
+  // Helper: ID_INTERNO principal (el primero seleccionado, para compatibilidad con steps 3-7)
+  const selectedId = selectedIds.length > 0 ? selectedIds[0] : null;
 
   const stats = useMemo(() => {
     let s5OK = 0;
@@ -162,34 +165,64 @@ function App() {
     }
   };
 
-  const handleSelect = (msg: Message) => {
-    setSelectedId(msg.ID_INTERNO);
-    setPcn(msg.PORT_CALL_NUMBER);
-    if (msg.NUM_CONTENEDORES) {
-      setMaxReg(msg.NUM_CONTENEDORES);
+  const toggleId = (msg: Message) => {
+    const id = msg.ID_INTERNO;
+    setSelectedIds(prev => {
+      if (prev.includes(id)) {
+        // Deseleccionar
+        const next = prev.filter(x => x !== id);
+        // Si era el primero, actualizar PCN al nuevo primero
+        if (prev[0] === id && next.length > 0) {
+          const firstMsg = messages.find(m => m.ID_INTERNO === next[0]);
+          if (firstMsg) setPcn(firstMsg.PORT_CALL_NUMBER);
+        } else if (next.length === 0) {
+          setPcn('');
+        }
+        return next;
+      } else {
+        // Seleccionar: si es el primero, fijar PCN
+        if (prev.length === 0) {
+          setPcn(msg.PORT_CALL_NUMBER);
+          if (msg.NUM_CONTENEDORES) setMaxReg(msg.NUM_CONTENEDORES);
+        }
+        return [...prev, id];
+      }
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.length === messages.length) {
+      setSelectedIds([]);
+      setPcn('');
+    } else {
+      setSelectedIds(messages.map(m => m.ID_INTERNO));
+      if (messages.length > 0) {
+        setPcn(messages[0].PORT_CALL_NUMBER);
+        if (messages[0].NUM_CONTENEDORES) setMaxReg(messages[0].NUM_CONTENEDORES);
+      }
     }
   };
 
   const handleStep2Submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedId || !pcn) return;
+    if (!selectedIds.length || !pcn) return;
 
     setLoading(true);
-    setStatus({ type: 'info', message: 'Processing Step 2: Loading Equipments...' });
+    setStatus({ type: 'info', message: `Processing Step 2: Loading Equipments for ${selectedIds.length} message(s)...` });
 
     try {
       const res = await fetch(`${API_BASE}/load-equipments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id_interno: selectedId,
+          id_internos: selectedIds,
           port_call_number: pcn,
           max_registros: maxReg
         })
       });
       const data = await res.json();
       if (data.status === 'success') {
-        setStatus({ type: 'success', message: `Successfully loaded ${data.count} equipments.` });
+        setStatus({ type: 'success', message: `Successfully loaded ${data.count} equipments from ${data.ids_procesados} message(s).` });
         setTimeout(() => setStep(3), 1500);
       } else {
         setStatus({ type: 'error', message: data.message });
@@ -210,7 +243,7 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id_interno: selectedId,
+          id_internos: selectedIds,
           port_call_number: pcn
         })
       });
@@ -401,10 +434,12 @@ function App() {
               </div>
               <button
                 className="btn btn-primary"
-                disabled={(!selectedId || !pcn) || loading}
+                disabled={(!selectedIds.length || !pcn) || loading}
                 onClick={() => setStep(2)}
               >
-                Continue to Step 2
+                {selectedIds.length > 0
+                  ? `Continuar con ${selectedIds.length} msg(s) →`
+                  : 'Continue to Step 2'}
               </button>
             </div>
           </div>
@@ -419,6 +454,14 @@ function App() {
                 <table className="data-table">
                   <thead>
                     <tr>
+                      <th style={{ width: '40px' }}>
+                        <input
+                          type="checkbox"
+                          checked={messages.length > 0 && selectedIds.length === messages.length}
+                          onChange={handleSelectAll}
+                          title="Seleccionar todos"
+                        />
+                      </th>
                       <th>ID Interno</th>
                       <th>Sender NAD</th>
                       <th>Date</th>
@@ -430,9 +473,17 @@ function App() {
                     {messages.map((msg) => (
                       <tr
                         key={msg.ID_INTERNO}
-                        className={selectedId === msg.ID_INTERNO ? 'selected' : ''}
-                        onClick={() => handleSelect(msg)}
+                        className={selectedIds.includes(msg.ID_INTERNO) ? 'selected' : ''}
+                        onClick={() => toggleId(msg)}
+                        style={{ cursor: 'pointer' }}
                       >
+                        <td onClick={e => e.stopPropagation()}>
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.includes(msg.ID_INTERNO)}
+                            onChange={() => toggleId(msg)}
+                          />
+                        </td>
                         <td>{msg.ID_INTERNO}</td>
                         <td>{msg.SENDER_NAD}</td>
                         <td>{new Date(msg.MESSAGE_DATE).toLocaleDateString()}</td>
@@ -458,7 +509,7 @@ function App() {
                       className="form-input"
                       type="number"
                       value={selectedId || ''}
-                      onChange={(e) => setSelectedId(parseInt(e.target.value))}
+                      onChange={(e) => setSelectedIds([parseInt(e.target.value)])}
                       placeholder="Ex: 56789"
                     />
                   </div>
@@ -498,8 +549,8 @@ function App() {
 
           <form id="step2Form" onSubmit={handleStep2Submit} style={{ marginTop: '1.5rem' }}>
             <div className="form-group">
-              <label>Selected ID_INTERNO</label>
-              <input className="form-input" value={selectedId || ''} disabled />
+              <label>IDs seleccionados ({selectedIds.length})</label>
+              <input className="form-input" value={selectedIds.join(', ') || 'Ninguno'} disabled />
             </div>
 
             <div className="form-group">

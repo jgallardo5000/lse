@@ -88,11 +88,11 @@ WHERE  cm.RECEIVER_UNB        = 'ESQ0817002I'
  * Step 2: Load equipments (REAL LOGIC).
  */
 app.post('/load-equipments', async (req: Request<{}, {}, LoadEquipmentsRequest>, res: Response) => {
-  const { id_interno, port_call_number, max_registros } = req.body;
+  const { id_internos, port_call_number, max_registros } = req.body;
 
-  console.log(`POST /load-equipments called for ID=${id_interno}`);
+  console.log(`POST /load-equipments called for IDs=${JSON.stringify(id_internos)}`);
 
-  if (!id_interno || !port_call_number || !max_registros) {
+  if (!id_internos || !id_internos.length || !port_call_number || !max_registros) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
@@ -100,56 +100,65 @@ app.post('/load-equipments', async (req: Request<{}, {}, LoadEquipmentsRequest>,
   try {
     oraConn = await getOracleConnection();
 
-    // 2a. Query Oracle
-    const sqlOra = `
-      SELECT ce.EQUIPMENT_ID_NUMBER,
-             ce.EQUIPMENT_TYPE,
-             ce.VGM_PESO_VERIFICADO
-      FROM   PORTIC.COPRAR_EQUIPAMIENTOS ce
-      WHERE  ce.ID_INTERNO             = :id_interno
-        AND  ce.FULL_EMPTY_INDICATOR   = 5
-        AND  ce.VGM_PESO_VERIFICADO    IS NOT NULL
-        AND  ROWNUM                   <= :max_reg
-    `;
-
-    const resultOra = await oraConn.execute<any[]>(sqlOra, [id_interno, max_registros], { outFormat: oracledb.OUT_FORMAT_OBJECT });
-    const rows = resultOra.rows || [];
-
-    if (rows.length === 0) {
-      return res.json({ status: "warning", message: "No equipments found in Oracle O sin peso verificado", count: 0 });
-    }
-
-    // 2b. Delete previous PG records
+    // 2b. Delete previous PG records for this escala
     await pg.query("DELETE FROM equipamientos_escala WHERE escala = $1", [port_call_number]);
 
-    // 2c & 2d. Insert and Update Tara in PG
-    for (const row of rows as any[]) {
-      const { EQUIPMENT_ID_NUMBER, EQUIPMENT_TYPE, VGM_PESO_VERIFICADO } = row;
+    let totalCount = 0;
 
-      const insertSql = `
-        INSERT INTO equipamientos_escala (id_lista, escala, equipamiento, tipo, peso, tara)
-        VALUES ($1, $2, $3, $4, $5, NULL)
-        RETURNING id
+    // 2a. Query Oracle para cada id_interno y acumular equipamientos
+    for (const id_interno of id_internos) {
+      const sqlOra = `
+        SELECT ce.EQUIPMENT_ID_NUMBER,
+               ce.EQUIPMENT_TYPE,
+               ce.VGM_PESO_VERIFICADO
+        FROM   PORTIC.COPRAR_EQUIPAMIENTOS ce
+        WHERE  ce.ID_INTERNO             = :id_interno
+          AND  ce.FULL_EMPTY_INDICATOR   = 5
+          AND  ce.VGM_PESO_VERIFICADO    IS NOT NULL
+          AND  ROWNUM                   <= :max_reg
       `;
-      await pg.query(insertSql, [
-        id_interno,
-        port_call_number,
-        EQUIPMENT_ID_NUMBER,
-        EQUIPMENT_TYPE,
-        Math.round(VGM_PESO_VERIFICADO || 0)
-      ]);
-      // incorporar tara desde la tabla taras
-      const updateSql = `
-        UPDATE equipamientos_escala ee
-        SET    tara = t.peso
-        FROM   taras t
-        WHERE  ee.equipamiento = $1
-          AND  t.tipo    = ee.tipo
-      `;
-      await pg.query(updateSql, [EQUIPMENT_ID_NUMBER]);
+
+      const resultOra = await oraConn.execute<any[]>(sqlOra, [id_interno, max_registros], { outFormat: oracledb.OUT_FORMAT_OBJECT });
+      const rows = resultOra.rows || [];
+
+      // 2c & 2d. Insert and Update Tara in PG
+      for (const row of rows as any[]) {
+        const { EQUIPMENT_ID_NUMBER, EQUIPMENT_TYPE, VGM_PESO_VERIFICADO } = row;
+
+        // Upsert: skip if already inserted by another id_interno
+        const insertSql = `
+          INSERT INTO equipamientos_escala (id_lista, escala, equipamiento, tipo, peso, tara)
+          VALUES ($1, $2, $3, $4, $5, NULL)
+          ON CONFLICT (escala, equipamiento) DO NOTHING
+          RETURNING id
+        `;
+        const insRes = await pg.query(insertSql, [
+          id_interno,
+          port_call_number,
+          EQUIPMENT_ID_NUMBER,
+          EQUIPMENT_TYPE,
+          Math.round(VGM_PESO_VERIFICADO || 0)
+        ]);
+        if (insRes.rowCount && insRes.rowCount > 0) {
+          // incorporar tara desde la tabla taras
+          const updateSql = `
+            UPDATE equipamientos_escala ee
+            SET    tara = t.peso
+            FROM   taras t
+            WHERE  ee.equipamiento = $1
+              AND  t.tipo    = ee.tipo
+          `;
+          await pg.query(updateSql, [EQUIPMENT_ID_NUMBER]);
+          totalCount++;
+        }
+      }
     }
 
-    res.json({ status: "success", count: rows.length, mode: "real" });
+    if (totalCount === 0) {
+      return res.json({ status: "warning", message: "No equipments found in Oracle o sin peso verificado", count: 0 });
+    }
+
+    res.json({ status: "success", count: totalCount, mode: "real", ids_procesados: id_internos.length });
   } catch (err) {
     console.error("Error in POST /load-equipments:", err);
     res.status(500).json({ error: "Failed to load equipments" });
@@ -162,19 +171,22 @@ app.post('/load-equipments', async (req: Request<{}, {}, LoadEquipmentsRequest>,
  * Step 3: Load partidas (REAL LOGIC).
  */
 app.post('/load-partidas', async (req: Request<{}, {}, ProcessPartidasRequest>, res: Response) => {
-  const { id_interno, port_call_number } = req.body;
+  const { id_internos, port_call_number } = req.body;
 
-  console.log(`POST /load-partidas called for PCN=${port_call_number}, ID_INTERNO=${id_interno}`);
+  console.log(`POST /load-partidas called for PCN=${port_call_number}, ID_INTERNOS=${JSON.stringify(id_internos)}`);
 
-  if (!id_interno || !port_call_number) {
-    return res.status(400).json({ error: "Missing required fields (id_interno or port_call_number)" });
+  if (!id_internos || !id_internos.length || !port_call_number) {
+    return res.status(400).json({ error: "Missing required fields (id_internos or port_call_number)" });
   }
+
+  // Usar el primer id_interno como referencia (el principal)
+  const id_interno = id_internos[0];
 
   let oraConn;
   try {
-    // 3a. Delete previous records for this id_lista in PG
-    await pg.query("DELETE FROM partidas_equipamiento WHERE idlista = $1", [id_interno]);
-    console.log(`  → DELETE partidas_equipamiento WHERE idlista=${id_interno}`);
+    // 3a. Delete previous records for this escala in PG
+    await pg.query("DELETE FROM partidas_equipamiento WHERE escala = $1", [parseInt(port_call_number)]);
+    console.log(`  → DELETE partidas_equipamiento WHERE escala=${port_call_number}`);
 
     // 3b. Get equipments from PG
     const pgRes = await pg.query("SELECT equipamiento FROM equipamientos_escala WHERE escala = $1", [port_call_number]);
