@@ -54,6 +54,7 @@ function App() {
   const [selectedCompareId, setSelectedCompareId] = useState<string | null>(null);
   const [escalaSearch, setEscalaSearch] = useState('');
   const [tolerancia, setTolerancia] = useState(10);
+  const [showConfirmSave, setShowConfirmSave] = useState(false);
 
   // Helper: ID_INTERNO principal (el primero seleccionado, para compatibilidad con steps 3-7)
   const selectedId = selectedIds.length > 0 ? selectedIds[0] : null;
@@ -288,14 +289,16 @@ function App() {
     }
   };
   
-  const handleSaveResults = async () => {
+  const handleSaveClick = () => {
     if (!selectedId || !pcn) {
-      alert("No hay escala o ID seleccionado.");
+      setStatus({ type: 'error', message: 'No hay escala o ID seleccionado.' });
       return;
     }
-    const confirmSave = window.confirm("¿Deseas guardar los resultados de la validación en la tabla 'coprar_lsp_equipamientos_postgres'?");
-    if (!confirmSave) return;
+    setShowConfirmSave(true);
+  };
 
+  const performSaveResults = async () => {
+    setShowConfirmSave(false);
     setLoading(true);
     setStatus({ type: 'info', message: 'Guardando resultados en Postgres...' });
     try {
@@ -692,18 +695,41 @@ function App() {
               <button className="btn btn-primary" onClick={() => setStep(6)}>
                 Summary (Step 6)
               </button>
-              <button 
-                className="btn" 
-                onClick={handleSaveResults} 
-                disabled={loading}
-                style={{ 
-                  backgroundColor: '#059669', 
-                  color: 'white',
-                  border: '1px solid #047857'
-                }}
-              >
-                Grabar Resultados
-              </button>
+              
+              {!showConfirmSave ? (
+                <button 
+                  className="btn" 
+                  onClick={handleSaveClick} 
+                  disabled={loading}
+                  style={{ 
+                    backgroundColor: '#059669', 
+                    color: 'white',
+                    border: '1px solid #047857'
+                  }}
+                >
+                  Grabar Resultados
+                </button>
+              ) : (
+                <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(5, 150, 105, 0.1)', padding: '0.4rem 0.8rem', borderRadius: '10px', border: '1px solid #059669' }}>
+                  <span style={{ fontSize: '0.85rem', color: '#10b981', alignSelf: 'center', marginRight: '0.4rem', fontWeight: 'bold' }}>
+                    ¿Confirmar guardado?
+                  </span>
+                  <button 
+                    className="btn btn-primary" 
+                    onClick={performSaveResults}
+                    style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem', backgroundColor: '#10b981' }}
+                  >
+                    Sí, Grabar
+                  </button>
+                  <button 
+                    className="btn" 
+                    onClick={() => setShowConfirmSave(false)}
+                    style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem', backgroundColor: '#ef4444', color: 'white' }}
+                  >
+                    No
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
