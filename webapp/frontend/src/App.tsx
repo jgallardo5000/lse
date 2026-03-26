@@ -1126,6 +1126,7 @@ function App() {
                     >
                       <option value="">Todos</option>
                       <option value="OK">OK</option>
++                     <option value="DOC">DOC</option>
                       <option value="KO">KO</option>
                       <option value="N/A">N/A</option>
                     </select>
