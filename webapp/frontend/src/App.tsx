@@ -287,6 +287,32 @@ function App() {
       setLoading(false);
     }
   };
+  
+  const handleSaveResults = async () => {
+    if (!selectedId || !pcn) {
+      alert("No hay escala o ID seleccionado.");
+      return;
+    }
+    const confirmSave = window.confirm("¿Deseas guardar los resultados de la validación en la tabla 'coprar_lsp_equipamientos_postgres'?");
+    if (!confirmSave) return;
+
+    setLoading(true);
+    setStatus({ type: 'info', message: 'Guardando resultados en Postgres...' });
+    try {
+      const res = await fetch(`${API_BASE}/results/validated?escala=${pcn}&id_lista=${selectedId}&tolerancia=${tolerancia}&grabar=true`);
+      if (res.ok) {
+        setStatus({ type: 'success', message: 'Resultados guardados correctamente en la tabla coprar_lsp_equipamientos_postgres.' });
+      } else {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Error al guardar');
+      }
+    } catch (err: any) {
+      console.error("Error saving results:", err);
+      setStatus({ type: 'error', message: `Error al guardar: ${err.message}` });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const exportToExcel = () => {
     const summaryData = buildSummary();
@@ -665,6 +691,18 @@ function App() {
               </div>
               <button className="btn btn-primary" onClick={() => setStep(6)}>
                 Summary (Step 6)
+              </button>
+              <button 
+                className="btn" 
+                onClick={handleSaveResults} 
+                disabled={loading}
+                style={{ 
+                  backgroundColor: '#059669', 
+                  color: 'white',
+                  border: '1px solid #047857'
+                }}
+              >
+                Grabar Resultados
               </button>
             </div>
           </div>
