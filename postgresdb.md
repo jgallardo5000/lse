@@ -127,6 +127,14 @@ AS SELECT ee.escala,
     ee.peso - ee.tara AS pesoneto
    FROM equipamientos_escala ee;
 
+create table coprar_lsp_equipamientos_postgres(
+    id serial primary key,
+    escala int8,
+    equipamiento varchar (15),
+    estado varchar (10)
+	);
+
+
 
 -- public.partidas_equipamiento_peso source
 
