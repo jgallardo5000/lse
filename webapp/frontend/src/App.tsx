@@ -55,6 +55,12 @@ function App() {
   const [escalaSearch, setEscalaSearch] = useState('');
   const [tolerancia, setTolerancia] = useState(10);
   const [showConfirmSave, setShowConfirmSave] = useState(false);
+  
+  // Filtros Paso 8
+  const [filterId, setFilterId] = useState('');
+  const [filterS4, setFilterS4] = useState('');
+  const [filterS5, setFilterS5] = useState('');
+  const [filterS7, setFilterS7] = useState('');
 
   // Helper: ID_INTERNO principal (el primero seleccionado, para compatibilidad con steps 3-7)
   const selectedId = selectedIds.length > 0 ? selectedIds[0] : null;
@@ -127,8 +133,15 @@ function App() {
         s5Status,
         s7Status
       };
+    })
+    .filter(row => {
+      const matchId = row.id.toLowerCase().includes(filterId.toLowerCase());
+      const matchS4 = !filterS4 || row.s4Status === filterS4;
+      const matchS5 = !filterS5 || row.s5Status === filterS5;
+      const matchS7 = !filterS7 || row.s7Status === filterS7;
+      return matchId && matchS4 && matchS5 && matchS7;
     });
-  }, [resEquipments, validationDetail, step7Data, resPartidas]);
+  }, [resEquipments, validationDetail, step7Data, resPartidas, filterId, filterS4, filterS5, filterS7]);
 
   useEffect(() => {
     if (selectedCompareId) {
@@ -1065,6 +1078,58 @@ function App() {
                   <th>Básica (Paso 4)</th>
                   <th>Avanzada (Paso 5)</th>
                   <th>LSP (Paso 7 - PG)</th>
+                </tr>
+                <tr className="filter-row" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                  <th style={{ padding: '0.4rem' }}>
+                    <input 
+                      className="form-input" 
+                      placeholder="ID..." 
+                      value={filterId} 
+                      onChange={e => setFilterId(e.target.value)}
+                      style={{ padding: '0.3rem', fontSize: '0.8rem', minHeight: 'auto', marginBottom: 0 }}
+                    />
+                  </th>
+                  <th></th>
+                  <th style={{ padding: '0.4rem' }}>
+                    <select 
+                      className="form-input" 
+                      value={filterS4} 
+                      onChange={e => setFilterS4(e.target.value)}
+                      style={{ padding: '0.3rem', fontSize: '0.8rem', minHeight: 'auto', marginBottom: 0, width: '100%' }}
+                    >
+                      <option value="">Todos</option>
+                      <option value="OK">OK</option>
+                      <option value="KO">KO</option>
+                      <option value="N/A">N/A</option>
+                    </select>
+                  </th>
+                  <th style={{ padding: '0.4rem' }}>
+                    <select 
+                      className="form-input" 
+                      value={filterS5} 
+                      onChange={e => setFilterS5(e.target.value)}
+                      style={{ padding: '0.3rem', fontSize: '0.8rem', minHeight: 'auto', marginBottom: 0, width: '100%' }}
+                    >
+                      <option value="">Todos</option>
+                      <option value="OK">OK</option>
+                      <option value="WARN">WARN</option>
+                      <option value="KO">KO</option>
+                      <option value="N/A">N/A</option>
+                    </select>
+                  </th>
+                  <th style={{ padding: '0.4rem' }}>
+                    <select 
+                      className="form-input" 
+                      value={filterS7} 
+                      onChange={e => setFilterS7(e.target.value)}
+                      style={{ padding: '0.3rem', fontSize: '0.8rem', minHeight: 'auto', marginBottom: 0, width: '100%' }}
+                    >
+                      <option value="">Todos</option>
+                      <option value="OK">OK</option>
+                      <option value="KO">KO</option>
+                      <option value="N/A">N/A</option>
+                    </select>
+                  </th>
                 </tr>
               </thead>
               <tbody>
