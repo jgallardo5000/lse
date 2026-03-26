@@ -403,6 +403,27 @@ app.get('/results/validated', async (req: Request, res: Response) => {
     const tol = tolerancia ? parseInt(tolerancia as string) : 10;
     const result = validar(algorithmPartidas, containers, tol);
 
+    // 5. Persist results if requested
+    const { grabar } = req.query;
+    if (grabar === 'true') {
+      console.log(`Persisting validation results for escala=${escala} to coprar_lsp_equipamientos_postgres...`);
+      
+      // Clear previous results for this scale
+      await pg.query("DELETE FROM coprar_lsp_equipamientos_postgres WHERE escala = $1", [escala]);
+      
+      // Insert new results
+      for (const det of result.detalle) {
+        // Map WARN to OK as per user request
+        const estadoFinal = (det.estado === 'WARN') ? 'OK' : det.estado;
+        
+        await pg.query(
+          "INSERT INTO coprar_lsp_equipamientos_postgres (escala, equipamiento, estado) VALUES ($1, $2, $3)",
+          [escala, det.contenedorId, estadoFinal]
+        );
+      }
+      console.log(`  → Successfully persisted ${result.detalle.length} records.`);
+    }
+
     res.json(result);
   } catch (err) {
     console.error("Error in /results/validated:", err);
