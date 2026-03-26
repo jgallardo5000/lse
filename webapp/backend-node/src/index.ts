@@ -239,7 +239,7 @@ app.post('/load-partidas', async (req: Request<{}, {}, ProcessPartidasRequest>, 
       const rows = oraRes.rows || [];
 
       for (const r of rows as any[]) {
-        const id_doc_partida = `${r.NUM_DOC}-${r.NUM_PAR}`;
+        const id_doc_partida = `${r.NUM_DOC}${r.NUM_PAR.toString().padStart(3, '0')}`;
         const insertPartidaSql = `
           INSERT INTO partidas_equipamiento
               (fecha_alta, id_documento_partida, peso, tipo_documento,

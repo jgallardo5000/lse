@@ -237,8 +237,11 @@ function App() {
       });
       const data = await res.json();
       if (data.status === 'success') {
-        setStatus({ type: 'success', message: `Successfully loaded ${data.count} equipments from ${data.ids_procesados} message(s).` });
-        setTimeout(() => setStep(3), 1500);
+        setStatus({ type: 'success', message: `Successfully loaded ${data.count} equipments. Starting Step 3 automatically...` });
+        setTimeout(() => {
+          setStep(3);
+          handleStep3Run();
+        }, 1500);
       } else {
         setStatus({ type: 'error', message: data.message });
       }
@@ -435,7 +438,6 @@ function App() {
         <div className={`step ${step >= 2 ? 'active' : ''} ${step > 2 ? 'completed' : ''}`}>2</div>
         <div className={`step ${step >= 3 ? 'active' : ''} ${step > 3 ? 'completed' : ''}`}>3</div>
         <div className={`step ${step >= 4 ? 'active' : ''} ${step > 4 ? 'completed' : ''}`}>4</div>
-        <div className={`step ${step >= 6 ? 'active' : ''} ${step > 6 ? 'completed' : ''}`}>6</div>
         <div className={`step ${step >= 7 ? 'active' : ''} ${step > 7 ? 'completed' : ''}`}>7</div>
         <div className={`step ${step >= 8 ? 'active' : ''} ${step > 8 ? 'completed' : ''}`}>8</div>
       </div>
@@ -705,8 +707,9 @@ function App() {
                 <span>KO</span>
                 <span className="count">{activeResultsTab === 'step5' ? stats.s5KO : stats.s4KO}</span>
               </div>
-              <button className="btn btn-primary" onClick={() => setStep(6)}>
-                Summary (Step 6)
+              <button className="btn btn-primary" onClick={handleStep7Run} disabled={loading}>
+                {loading && <div className="loader"></div>}
+                Step 7 (LSP)
               </button>
               
               {!showConfirmSave ? (
@@ -962,7 +965,7 @@ function App() {
                 <span className="count">{stats.s7KO}</span>
               </div>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button className="btn" onClick={() => setStep(6)} style={{ color: 'white' }}>
+                <button className="btn" onClick={() => setStep(4)} style={{ color: 'white' }}>
                   Back
                 </button>
                 <button className="btn btn-primary" onClick={() => setStep(8)}>
@@ -1189,10 +1192,10 @@ function App() {
             <div style={{ display: 'flex', gap: '1rem' }}>
               <button
                 className="btn"
-                onClick={() => setStep(6)}
+                onClick={() => setStep(4)}
                 style={{ color: 'white', background: 'rgba(255,255,255,0.05)' }}
               >
-                Volver a Resumen (Paso 6)
+                Volver a Resultados (Paso 4)
               </button>
               <button
                 className="btn btn-primary"
